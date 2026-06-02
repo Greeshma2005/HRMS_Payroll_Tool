@@ -145,7 +145,7 @@ export function AppShell({
           <div className="h-6 w-6 rounded bg-primary/80 grid place-items-center text-[10px] font-bold">
             L
           </div>
-          <span>Lumen HRMS</span>
+          <span>People's Pulse</span>
         </Link>
         <div className="hidden md:flex items-center gap-2 ml-6 text-xs opacity-80">
           <span>Workspaces</span>

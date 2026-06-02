@@ -82,7 +82,7 @@ function AuthPage() {
       <div className="hidden lg:flex flex-col justify-between p-10 bg-d365-header text-d365-header-foreground">
         <div className="flex items-center gap-2 font-semibold">
           <div className="h-7 w-7 rounded bg-primary grid place-items-center text-xs font-bold">L</div>
-          Lumen HRMS
+          People's Pulse HRMS
         </div>
         <div>
           <h2 className="text-3xl font-semibold tracking-tight max-w-md">A cloud HRMS built around D365-style workspaces.</h2>

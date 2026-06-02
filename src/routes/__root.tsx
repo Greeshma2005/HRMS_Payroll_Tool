@@ -42,7 +42,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lumen HRMS — D365-style HR, Payroll & Attendance" },
+      { title: "Peoples Pulse — D365-style HR, Payroll & Attendance" },
       { name: "description", content: "Cloud HRMS with attendance, leave, payroll, travel and expense management. Built for D365 F&O-style workspaces." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
