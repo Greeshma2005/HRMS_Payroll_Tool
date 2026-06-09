@@ -19,13 +19,21 @@ export const Route = createFileRoute("/employees")({
 });
 
 function Employees() {
+  console.log(import.meta.env.VITE_SUPABASE_URL);
   const [q, setQ] = useState("");
-  const filtered = useMemo(() => employees.filter((e) => [e.name, e.code, e.email, e.department].some((v) => v.toLowerCase().includes(q.toLowerCase()))), [q]);
-
+  const filtered = useMemo(
+  () =>
+    fetchedEmployees.filter((e) =>
+      [e.name, e.code, e.email, e.department].some((v) =>
+        (v || "").toLowerCase().includes(q.toLowerCase())
+      )
+    ),
+  [q, fetchedEmployees]
+);
   return (
     <AppShell
       title="Employee Management"
-      subtitle="248 employees · 6 departments · 5 locations"
+      subtitle={`${fetchedEmployees.length} employees`}
       actions={
         <>
           <Button variant="outline" size="sm" onClick={() => downloadCSV("employees.csv", employees as any)}><Download className="h-3.5 w-3.5 mr-1.5" />Export</Button>
