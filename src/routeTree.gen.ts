@@ -14,10 +14,15 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ReimbursementRouteImport } from './routes/reimbursement'
 import { Route as PunchRouteImport } from './routes/punch'
 import { Route as PayrollRouteImport } from './routes/payroll'
+import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as LeaveRouteImport } from './routes/leave'
 import { Route as ImportsRouteImport } from './routes/imports'
 import { Route as ExpenseRouteImport } from './routes/expense'
+import { Route as EmployeesNewRouteImport } from './routes/employees-new'
+import { Route as EmployeesEditRouteImport } from './routes/employees-edit'
 import { Route as EmployeesRouteImport } from './routes/employees'
+import { Route as DesignationsRouteImport } from './routes/designations'
+import { Route as DepartmentsRouteImport } from './routes/departments'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as IndexRouteImport } from './routes/index'
@@ -47,6 +52,11 @@ const PayrollRoute = PayrollRouteImport.update({
   path: '/payroll',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocationsRoute = LocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LeaveRoute = LeaveRouteImport.update({
   id: '/leave',
   path: '/leave',
@@ -62,9 +72,29 @@ const ExpenseRoute = ExpenseRouteImport.update({
   path: '/expense',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeesNewRoute = EmployeesNewRouteImport.update({
+  id: '/employees-new',
+  path: '/employees-new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployeesEditRoute = EmployeesEditRouteImport.update({
+  id: '/employees-edit',
+  path: '/employees-edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeesRoute = EmployeesRouteImport.update({
   id: '/employees',
   path: '/employees',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesignationsRoute = DesignationsRouteImport.update({
+  id: '/designations',
+  path: '/designations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepartmentsRoute = DepartmentsRouteImport.update({
+  id: '/departments',
+  path: '/departments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -87,10 +117,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/attendance': typeof AttendanceRoute
   '/auth': typeof AuthRoute
+  '/departments': typeof DepartmentsRoute
+  '/designations': typeof DesignationsRoute
   '/employees': typeof EmployeesRoute
+  '/employees-edit': typeof EmployeesEditRoute
+  '/employees-new': typeof EmployeesNewRoute
   '/expense': typeof ExpenseRoute
   '/imports': typeof ImportsRoute
   '/leave': typeof LeaveRoute
+  '/locations': typeof LocationsRoute
   '/payroll': typeof PayrollRoute
   '/punch': typeof PunchRoute
   '/reimbursement': typeof ReimbursementRoute
@@ -101,10 +136,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/attendance': typeof AttendanceRoute
   '/auth': typeof AuthRoute
+  '/departments': typeof DepartmentsRoute
+  '/designations': typeof DesignationsRoute
   '/employees': typeof EmployeesRoute
+  '/employees-edit': typeof EmployeesEditRoute
+  '/employees-new': typeof EmployeesNewRoute
   '/expense': typeof ExpenseRoute
   '/imports': typeof ImportsRoute
   '/leave': typeof LeaveRoute
+  '/locations': typeof LocationsRoute
   '/payroll': typeof PayrollRoute
   '/punch': typeof PunchRoute
   '/reimbursement': typeof ReimbursementRoute
@@ -116,10 +156,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/attendance': typeof AttendanceRoute
   '/auth': typeof AuthRoute
+  '/departments': typeof DepartmentsRoute
+  '/designations': typeof DesignationsRoute
   '/employees': typeof EmployeesRoute
+  '/employees-edit': typeof EmployeesEditRoute
+  '/employees-new': typeof EmployeesNewRoute
   '/expense': typeof ExpenseRoute
   '/imports': typeof ImportsRoute
   '/leave': typeof LeaveRoute
+  '/locations': typeof LocationsRoute
   '/payroll': typeof PayrollRoute
   '/punch': typeof PunchRoute
   '/reimbursement': typeof ReimbursementRoute
@@ -132,10 +177,15 @@ export interface FileRouteTypes {
     | '/'
     | '/attendance'
     | '/auth'
+    | '/departments'
+    | '/designations'
     | '/employees'
+    | '/employees-edit'
+    | '/employees-new'
     | '/expense'
     | '/imports'
     | '/leave'
+    | '/locations'
     | '/payroll'
     | '/punch'
     | '/reimbursement'
@@ -146,10 +196,15 @@ export interface FileRouteTypes {
     | '/'
     | '/attendance'
     | '/auth'
+    | '/departments'
+    | '/designations'
     | '/employees'
+    | '/employees-edit'
+    | '/employees-new'
     | '/expense'
     | '/imports'
     | '/leave'
+    | '/locations'
     | '/payroll'
     | '/punch'
     | '/reimbursement'
@@ -160,10 +215,15 @@ export interface FileRouteTypes {
     | '/'
     | '/attendance'
     | '/auth'
+    | '/departments'
+    | '/designations'
     | '/employees'
+    | '/employees-edit'
+    | '/employees-new'
     | '/expense'
     | '/imports'
     | '/leave'
+    | '/locations'
     | '/payroll'
     | '/punch'
     | '/reimbursement'
@@ -175,10 +235,15 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AttendanceRoute: typeof AttendanceRoute
   AuthRoute: typeof AuthRoute
+  DepartmentsRoute: typeof DepartmentsRoute
+  DesignationsRoute: typeof DesignationsRoute
   EmployeesRoute: typeof EmployeesRoute
+  EmployeesEditRoute: typeof EmployeesEditRoute
+  EmployeesNewRoute: typeof EmployeesNewRoute
   ExpenseRoute: typeof ExpenseRoute
   ImportsRoute: typeof ImportsRoute
   LeaveRoute: typeof LeaveRoute
+  LocationsRoute: typeof LocationsRoute
   PayrollRoute: typeof PayrollRoute
   PunchRoute: typeof PunchRoute
   ReimbursementRoute: typeof ReimbursementRoute
@@ -223,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayrollRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations': {
+      id: '/locations'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/leave': {
       id: '/leave'
       path: '/leave'
@@ -244,11 +316,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExpenseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employees-new': {
+      id: '/employees-new'
+      path: '/employees-new'
+      fullPath: '/employees-new'
+      preLoaderRoute: typeof EmployeesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employees-edit': {
+      id: '/employees-edit'
+      path: '/employees-edit'
+      fullPath: '/employees-edit'
+      preLoaderRoute: typeof EmployeesEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employees': {
       id: '/employees'
       path: '/employees'
       fullPath: '/employees'
       preLoaderRoute: typeof EmployeesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/designations': {
+      id: '/designations'
+      path: '/designations'
+      fullPath: '/designations'
+      preLoaderRoute: typeof DesignationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/departments': {
+      id: '/departments'
+      path: '/departments'
+      fullPath: '/departments'
+      preLoaderRoute: typeof DepartmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -279,10 +379,15 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AttendanceRoute: AttendanceRoute,
   AuthRoute: AuthRoute,
+  DepartmentsRoute: DepartmentsRoute,
+  DesignationsRoute: DesignationsRoute,
   EmployeesRoute: EmployeesRoute,
+  EmployeesEditRoute: EmployeesEditRoute,
+  EmployeesNewRoute: EmployeesNewRoute,
   ExpenseRoute: ExpenseRoute,
   ImportsRoute: ImportsRoute,
   LeaveRoute: LeaveRoute,
+  LocationsRoute: LocationsRoute,
   PayrollRoute: PayrollRoute,
   PunchRoute: PunchRoute,
   ReimbursementRoute: ReimbursementRoute,

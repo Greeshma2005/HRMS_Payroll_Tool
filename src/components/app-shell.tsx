@@ -49,9 +49,10 @@ const NAV: NavItem[] = [
     icon: Users,
     children: [
       { label: "Employees", href: "/employees" },
-      { label: "New Employee", href: "/employees?new=1" },
-      { label: "Departments", href: "/employees?tab=departments" },
-      { label: "Locations", href: "/employees?tab=locations" },
+      { label: "New Employee", href: "/employees-new" },
+      { label: "Departments", href: "/departments" },
+      { label: "Designations", href: "/designations" },
+      { label: "Locations", href: "/locations" },
     ],
   },
   {

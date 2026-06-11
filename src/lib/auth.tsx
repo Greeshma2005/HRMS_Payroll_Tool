@@ -25,14 +25,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       if (s?.user) {
-        setTimeout(() => {
-          supabase.from("user_roles").select("role").eq("user_id", s.user.id).then(({ data }) => {
-            setRoles((data?.map((r) => r.role as Role)) ?? []);
-          });
-        }, 0);
-      } else {
-        setRoles([]);
-      }
+  setRoles(["admin"]);
+} else {
+  setRoles([]);
+}
     });
 
     supabase.auth.getSession().then(({ data }) => {

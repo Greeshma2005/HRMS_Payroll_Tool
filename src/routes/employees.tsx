@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { AppShell, RequireAuth } from "@/components/app-shell";
 import { employees, departments, locations } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
@@ -11,38 +13,113 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { downloadCSV } from "@/lib/csv";
-import { Download, Upload, Plus, Search } from "lucide-react";
+import { Download, Upload, Plus, Search, Edit } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/employees")({
-  component: () => <RequireAuth><Employees /></RequireAuth>,
+  component: () => (
+    <RequireAuth>
+      <Employees />
+    </RequireAuth>
+  ),
 });
 
 function Employees() {
   console.log(import.meta.env.VITE_SUPABASE_URL);
+
   const [q, setQ] = useState("");
+  const [fetchedEmployees, setFetchedEmployees] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadEmployees() {
+      const { data, error } = await supabase
+  .from("employees")
+  .select(`
+    *,
+    departments!employees_department_id_fkey (
+      name
+    ),
+    designations!employees_designation_id_fkey (
+      name
+    )
+  `);
+
+      console.log("EMPLOYEE DATA:", data);
+      console.log("ERROR:", error);
+        
+      console.log("DATA:", data);
+      console.log("ERROR:", error);
+
+      if (error) {
+        console.error("Supabase Error:", error);
+        setLoading(false);
+        return;
+      }
+
+      const mapped =
+        data?.map((e: any) => ({
+          id: e.id,
+          code: e.employee_code,
+          name: `${e.first_name ?? ""} ${e.last_name ?? ""}`.trim(),
+          email: e.email,
+          department: e.departments?.name ?? "",
+          designation: e.designations?.name ?? "",
+          location: "",
+          manager: "",
+          status: e.status ?? "Active",
+          joined: e.joining_date ?? "",
+          ctc: 0,
+        })) || [];
+
+      setFetchedEmployees(mapped);
+      setLoading(false);
+    }
+
+    loadEmployees();
+  }, []);
+
   const filtered = useMemo(
-  () =>
-    fetchedEmployees.filter((e) =>
+    () =>
+      fetchedEmployees.filter((e) =>
       [e.name, e.code, e.email, e.department].some((v) =>
         (v || "").toLowerCase().includes(q.toLowerCase())
       )
     ),
   [q, fetchedEmployees]
 );
+
+  const search = useSearch({ from: "/employees" });
+  const activeTab = search.tab || "employees";
+
+  console.log("ACTIVE TAB =", activeTab);
+
   return (
     <AppShell
       title="Employee Management"
       subtitle={`${fetchedEmployees.length} employees`}
       actions={
-        <>
-          <Button variant="outline" size="sm" onClick={() => downloadCSV("employees.csv", employees as any)}><Download className="h-3.5 w-3.5 mr-1.5" />Export</Button>
-          <Button variant="outline" size="sm" onClick={() => toast.info("Open Imports module to bulk upload.")}><Upload className="h-3.5 w-3.5 mr-1.5" />Import</Button>
-          <NewEmployeeDialog />
-        </>
-      }
+  <>
+          <Button variant="outline" size="sm" onClick={() => downloadCSV("employees.csv", employees as any)}>
+          <Download className="h-3.5 w-3.5 mr-1.5" />
+          Export
+        </Button>
+
+          <Button variant="outline" size="sm" onClick={() => toast.info("Open Imports module to bulk upload.")}>
+          <Upload className="h-3.5 w-3.5 mr-1.5" />
+          Import
+        </Button>
+
+    <Link to="/employees-new">
+      <Button size="sm">
+        <Plus className="h-3.5 w-3.5 mr-1.5" />
+        New Employee
+      </Button>
+    </Link>
+  </>
+}
     >
-      <Tabs defaultValue="employees">
+      <Tabs value={activeTab}>
         <TabsList>
           <TabsTrigger value="employees">Employees</TabsTrigger>
           <TabsTrigger value="departments">Departments</TabsTrigger>
@@ -63,7 +140,7 @@ function Employees() {
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 text-xs text-muted-foreground">
                     <tr>
-                      {["Code","Name","Email","Department","Designation","Location","Manager","Status","Joined","CTC"].map(h => <th key={h} className="text-left px-3 py-2 font-medium">{h}</th>)}
+                      {["Code","Name","Email","Department","Designation","Location","Manager","Status","Joined","CTC", "Actions"].map(h => <th key={h} className="text-left px-3 py-2 font-medium">{h}</th>)}
                     </tr>
                   </thead>
                   <tbody>
@@ -79,6 +156,16 @@ function Employees() {
                         <td className="px-3 py-1.5"><Badge variant={e.status === "Active" ? "default" : "secondary"}>{e.status}</Badge></td>
                         <td className="px-3 py-1.5">{e.joined}</td>
                         <td className="px-3 py-1.5 text-right">₹{e.ctc.toLocaleString("en-IN")}</td>
+                        <td className="px-3 py-1.5">
+                          <Link
+                            to="/employees-edit"
+                            search={{ id: e.id }}
+                          >
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -106,34 +193,5 @@ function Employees() {
         </TabsContent>
       </Tabs>
     </AppShell>
-  );
-}
-
-function NewEmployeeDialog() {
-  return (
-    <Dialog>
-      <DialogTrigger asChild><Button size="sm"><Plus className="h-3.5 w-3.5 mr-1.5" />New employee</Button></DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader><DialogTitle>New employee</DialogTitle></DialogHeader>
-        <form onSubmit={(e) => { e.preventDefault(); toast.success("Employee saved (demo)"); }} className="grid grid-cols-2 gap-3">
-          <div className="col-span-2"><Label>Full name</Label><Input required /></div>
-          <div><Label>Employee code</Label><Input required placeholder="EMP1025" /></div>
-          <div><Label>Email</Label><Input type="email" required /></div>
-          <div><Label>Department</Label>
-            <Select><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-              <SelectContent>{departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-            </Select>
-          </div>
-          <div><Label>Location</Label>
-            <Select><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-              <SelectContent>{locations.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
-            </Select>
-          </div>
-          <div><Label>Designation</Label><Input /></div>
-          <div><Label>CTC (₹)</Label><Input type="number" /></div>
-          <DialogFooter className="col-span-2"><Button type="submit">Save</Button></DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }
