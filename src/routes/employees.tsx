@@ -30,6 +30,7 @@ function Employees() {
   const [q, setQ] = useState("");
   const [fetchedEmployees, setFetchedEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadEmployees() {
@@ -91,33 +92,35 @@ function Employees() {
 
   const search = useSearch({ from: "/employees" });
   const activeTab = search.tab || "employees";
-
+  
   console.log("ACTIVE TAB =", activeTab);
+  console.log("Selected Employee =", selectedEmployee);
+
+      async function deleteEmployee(id: string) {
+
+      const confirmDelete =
+        confirm("Delete this employee?");
+
+      if (!confirmDelete) return;
+
+      const { error } = await supabase
+        .from("employees")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      window.location.reload();
+    }
 
   return (
     <AppShell
       title="Employee Management"
       subtitle={`${fetchedEmployees.length} employees`}
-      actions={
-  <>
-          <Button variant="outline" size="sm" onClick={() => downloadCSV("employees.csv", employees as any)}>
-          <Download className="h-3.5 w-3.5 mr-1.5" />
-          Export
-        </Button>
-
-          <Button variant="outline" size="sm" onClick={() => toast.info("Open Imports module to bulk upload.")}>
-          <Upload className="h-3.5 w-3.5 mr-1.5" />
-          Import
-        </Button>
-
-    <Link to="/employees-new">
-      <Button size="sm">
-        <Plus className="h-3.5 w-3.5 mr-1.5" />
-        New Employee
-      </Button>
-    </Link>
-  </>
-}
+      actions={null}
     >
       <Tabs value={activeTab}>
         <TabsList>
@@ -128,24 +131,85 @@ function Employees() {
         </TabsList>
         <TabsContent value="employees">
           <Card>
-            <CardContent className="p-0">
-              <div className="p-3 border-b flex items-center gap-2">
-                <div className="relative">
-                  <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, code, email…" className="h-8 pl-7 w-72" />
-                </div>
-                <Badge variant="secondary">{filtered.length} results</Badge>
-              </div>
-              <div className="overflow-x-auto">
+              <CardContent className="p-0">
+
+                {/* D365 Toolbar */}
+
+                <div className="flex gap-2 border-b p-3">
+
+                    <Link to="/employees-new">
+                      <Button size="sm">
+                        New
+                      </Button>
+                    </Link>
+
+                    <Link
+                      to="/employees-edit"
+                      search={{ id: selectedEmployee || "" }}
+                    >
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={!selectedEmployee}
+                      >
+                        Edit
+                      </Button>
+                    </Link>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!selectedEmployee}
+                      onClick={() => {
+                        if (selectedEmployee) {
+                          deleteEmployee(selectedEmployee);
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.location.reload()}
+                    >
+                      Refresh
+                    </Button>
+
+                  </div>
+
+                    {/* Search */}
+                  <div className="p-3 border-b flex items-center gap-2">
+                    <div className="relative">
+                    <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={q}
+                      onChange={(e) => setQ(e.target.value)}
+                      placeholder="Search employee..."
+                      className="pl-7 w-72"
+                    />
+                  </div>
+                  </div>
+
+                  {/* Grid */}
+                  <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 text-xs text-muted-foreground">
                     <tr>
-                      {["Code","Name","Email","Department","Designation","Location","Manager","Status","Joined","CTC", "Actions"].map(h => <th key={h} className="text-left px-3 py-2 font-medium">{h}</th>)}
+                      {["","Code","Name","Email","Department","Designation","Location","Manager","Status","Joined","CTC"].map(h => <th key={h} className="text-left px-3 py-2 font-medium">{h}</th>)}
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((e) => (
-                      <tr key={e.id} className="border-t hover:bg-accent/30">
+                      <tr key={e.id} onClick={() => setSelectedEmployee(e.id)}
+                        className={`border-t cursor-pointer ${
+                          selectedEmployee === e.id
+                            ? "bg-blue-100"
+                            : "hover:bg-accent/30"
+                        }`}
+                      >
+                        
                         <td className="px-3 py-1.5 font-mono text-xs">{e.code}</td>
                         <td className="px-3 py-1.5 font-medium">{e.name}</td>
                         <td className="px-3 py-1.5 text-muted-foreground">{e.email}</td>
@@ -156,16 +220,7 @@ function Employees() {
                         <td className="px-3 py-1.5"><Badge variant={e.status === "Active" ? "default" : "secondary"}>{e.status}</Badge></td>
                         <td className="px-3 py-1.5">{e.joined}</td>
                         <td className="px-3 py-1.5 text-right">₹{e.ctc.toLocaleString("en-IN")}</td>
-                        <td className="px-3 py-1.5">
-                          <Link
-                            to="/employees-edit"
-                            search={{ id: e.id }}
-                          >
-                            <Button variant="ghost" size="sm">
-                              <Edit className="h-3.5 w-3.5" />
-                            </Button>
-                          </Link>
-                        </td>
+                        
                       </tr>
                     ))}
                   </tbody>

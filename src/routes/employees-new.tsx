@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -23,15 +24,16 @@ import {
 
 export const Route = createFileRoute("/employees-new")({
   component: () => (
-    <RequireAuth>
+     <RequireAuth>
       <NewEmployeePage />
     </RequireAuth>
-  ),
+  ), 
 });
 
 
 function NewEmployeePage() {
   
+  const navigate = useNavigate();
   const [employeeCode, setEmployeeCode] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -42,6 +44,8 @@ function NewEmployeePage() {
   const [joiningDate, setJoiningDate] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const [designationId, setDesignationId] = useState("");
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [designations, setDesignations] = useState<any[]>([]);
 
   async function saveEmployee() {
   
@@ -248,7 +252,15 @@ function NewEmployeePage() {
             </div>
 
             <div className="md:col-span-2 flex justify-end gap-2 mt-4">
-              <Button variant="outline">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  navigate({
+                    to: "/employees",
+                  })
+                }
+              >
                 Cancel
               </Button>
 

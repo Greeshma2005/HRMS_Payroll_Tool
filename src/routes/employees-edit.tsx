@@ -1,3 +1,4 @@
+import { EmployeeForm } from "@/components/employee-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
@@ -95,6 +96,10 @@ async function loadMasterData() {
 
 async function updateEmployee() {
 
+console.log({
+  dateOfBirth,
+  joiningDate,
+});  
 console.log("Employee ID =", employeeId);
 
   const { error } = await supabase
@@ -106,8 +111,8 @@ console.log("Employee ID =", employeeId);
       email: email,
       phone: phone,
       gender: gender,
-      date_of_birth: dateOfBirth,
-      joining_date: joiningDate,
+      date_of_birth: dateOfBirth || null,
+      joining_date: joiningDate || null,
       department_id: departmentId,
       designation_id: designationId,
     })
